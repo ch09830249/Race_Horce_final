@@ -282,7 +282,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="2"
                         android:textColor="#FF0000"></TextView>
                 </LinearLayout>
 
@@ -304,7 +303,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="2"
                         android:textColor="#A6A600"></TextView>
                 </LinearLayout>
 
@@ -326,7 +324,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="2"
                         android:textColor="#FF8000"></TextView>
                 </LinearLayout>
 
@@ -348,7 +345,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="2"
                         android:textColor="#82D900"></TextView>
                 </LinearLayout>
             </LinearLayout>

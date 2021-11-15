@@ -37,21 +37,37 @@ class GameFragment : Fragment() {
 
         binding.lifecycleOwner = viewLifecycleOwner
 
-        binding.button1.setOnClickListener{
+        binding.button1.setOnClickListener {
             viewModel.startGame()
         }
 
-        binding.button2.setOnClickListener { view : View ->
+        binding.button2.setOnClickListener { view: View ->
             view.findNavController().navigate(R.id.action_gameFragment_to_historyFragment)
         }
 
-        viewModel.miles_apple.observe(viewLifecycleOwner, Observer { newMiles -> binding.progressBar1.progress = newMiles
+        viewModel.miles_apple.observe(viewLifecycleOwner, Observer { newMiles ->
+            binding.progressBar1.progress = newMiles
         })
-        viewModel.miles_banana.observe(viewLifecycleOwner, Observer { newMiles -> binding.progressBar2.progress = newMiles
+        viewModel.miles_banana.observe(viewLifecycleOwner, Observer { newMiles ->
+            binding.progressBar2.progress = newMiles
         })
-        viewModel.miles_orange.observe(viewLifecycleOwner, Observer { newMiles -> binding.progressBar3.progress = newMiles
+        viewModel.miles_orange.observe(viewLifecycleOwner, Observer { newMiles ->
+            binding.progressBar3.progress = newMiles
         })
-        viewModel.miles_pineapple.observe(viewLifecycleOwner, Observer { newMiles -> binding.progressBar4.progress = newMiles
+        viewModel.miles_pineapple.observe(viewLifecycleOwner, Observer { newMiles ->
+            binding.progressBar4.progress = newMiles
+        })
+        viewModel.ratio_apple.observe(viewLifecycleOwner, Observer { newRatio ->
+            binding.ratio1.text = String.format("%.1f", newRatio)
+        })
+        viewModel.ratio_banana.observe(viewLifecycleOwner, Observer { newRatio ->
+            binding.ratio2.text = String.format("%.1f", newRatio)
+        })
+        viewModel.ratio_orange.observe(viewLifecycleOwner, Observer { newRatio ->
+            binding.ratio3.text = String.format("%.1f", newRatio)
+        })
+        viewModel.ratio_pineapple.observe(viewLifecycleOwner, Observer { newRatio ->
+            binding.ratio4.text = String.format("%.1f", newRatio)
         })
 
         return binding.root
