@@ -6,12 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RadioButton
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.horcerunning_final.R
 import com.example.horcerunning_final.databinding.FragmentGameBinding
+import java.lang.Exception
 
 class GameFragment : Fragment() {
 
@@ -35,9 +37,18 @@ class GameFragment : Fragment() {
         Log.i("GameFragment", "Called ViewModelProvider.get")
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
+        viewModel.fetch_exchangeRate()
+
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.button1.setOnClickListener {
+            try {
+                viewModel.betmoney = binding.edittext.text.toString().trim().toInt()
+                val RadioB1 = binding.rg1
+                val RadioBtm: RadioButton = binding.root.findViewById(RadioB1.getCheckedRadioButtonId())
+                viewModel.bethorsename = RadioBtm.text.toString()
+            }catch (e: Exception){
+            }
             viewModel.startGame()
         }
 
@@ -68,6 +79,12 @@ class GameFragment : Fragment() {
         })
         viewModel.ratio_pineapple.observe(viewLifecycleOwner, Observer { newRatio ->
             binding.ratio4.text = String.format("%.1f", newRatio)
+        })
+        viewModel.capital.observe(viewLifecycleOwner, Observer { newCapital ->
+            binding.txt3.text = newCapital.toString()
+        })
+        viewModel.currency.observe(viewLifecycleOwner, Observer { newExchangeRate ->
+            binding.txtRatio4.text = newExchangeRate.toString()
         })
 
         return binding.root

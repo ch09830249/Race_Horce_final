@@ -6,27 +6,27 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class GameViewModel : ViewModel() {
 
-    var winner: String? = null                     //獲勝馬匹
+    var winner: String? = null                     //The winner horse
     var miles_apple = MutableLiveData<Int>()
     var miles_banana = MutableLiveData<Int>()
     var miles_orange = MutableLiveData<Int>()
     var miles_pineapple = MutableLiveData<Int>()
-    var ratio_apple= MutableLiveData<Double>()
-    var ratio_banana= MutableLiveData<Double>()
-    var ratio_orange= MutableLiveData<Double>()
-    var ratio_pineapple= MutableLiveData<Double>()
-
-
-    var betmoney: Int? = null                      //下注金
-    var capital: Int = 10000                       //賭金
-    var bethorsename: String? = null               //下注馬匹
-    var earn: Int? = null                           //獎金 (這裡已經乘上匯率所以是台幣)
-    var currency: Double = 0.0                      //當天匯率
-
+    var ratio_apple = MutableLiveData<Double>()
+    var ratio_banana = MutableLiveData<Double>()
+    var ratio_orange = MutableLiveData<Double>()
+    var ratio_pineapple = MutableLiveData<Double>()
+    var capital = MutableLiveData<Int>()                      //ALl money we have
+    var currency = MutableLiveData<Double>()                      //Exchage Rate from the USD to TWD
+    var betmoney: Int? = null                      //The money you bet in this turn
+    var bethorsename: String? = null               //The horse you bet in this turn
+    var earn: Int? = 0                           //The money you earn in this turn
 
     init {
         miles_apple.value = 0
@@ -37,12 +37,14 @@ class GameViewModel : ViewModel() {
         ratio_banana.value = 2.0
         ratio_orange.value = 2.0
         ratio_pineapple.value = 2.0
+        capital.value = 10000
+        currency.value = 30.0
         Log.i("GameViewModel", "GameViewModel created!")
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        Log.i("GameViewModel", "GameViewModel destroyed!")
+    fun fetch_exchangeRate() {
+        CoroutineScope(Dispatchers.IO).launch {
+        }
     }
 
 
@@ -68,6 +70,11 @@ class GameViewModel : ViewModel() {
             job2.join()
             job3.join()
             job4.join()
+
+            println(earn)
+            println(winner)
+            println(bethorsename)
+            println(betmoney)
         }
 
     }
@@ -84,18 +91,23 @@ class GameViewModel : ViewModel() {
     fun Run(horseName: String) {
         var name = horseName
         lateinit var miles_horse: MutableLiveData<Int>
+        lateinit var ratio_horse: MutableLiveData<Double>
         when (name) {
             "apple" -> {
                 miles_horse = miles_apple
+                ratio_horse = ratio_apple
             }
             "banana" -> {
                 miles_horse = miles_banana
+                ratio_horse = ratio_banana
             }
             "orange" -> {
                 miles_horse = miles_orange
+                ratio_horse = ratio_orange
             }
             else -> {
                 miles_horse = miles_pineapple
+                ratio_horse = ratio_pineapple
             }
         }
         while (miles_horse.value!! < 19) {
@@ -104,17 +116,41 @@ class GameViewModel : ViewModel() {
                 miles_horse.value = (miles_horse.value)?.plus(1)
             }
         }
-        win_or_lose(name, miles_horse)
+        win_or_lose(name, miles_horse, ratio_horse)
     }
 
+    //The last mile to the destination and winner should calculate the final earn
     @Synchronized
-    fun win_or_lose(horseName: String, miles_horse: MutableLiveData<Int>) {
+    fun win_or_lose(
+        horseName: String,
+        miles_horse: MutableLiveData<Int>,
+        ratio_horse: MutableLiveData<Double>
+    ) {
         CoroutineScope(Dispatchers.Main).launch {
             miles_horse.value = (miles_horse.value)?.plus(1)
+            if (winner == null) {
+                winner = horseName
+                race_resukt(ratio_horse)
+                if (ratio_horse.value!! > 2.0)
+                    ratio_horse.value = (ratio_horse.value)?.minus(0.1)
+            } else {
+                if (ratio_horse.value!! < 5.0)
+                    ratio_horse.value = (ratio_horse.value)?.plus(0.1)
+            }
         }
-        if (winner == null) {
-            winner = horseName
-            Thread.sleep((0..200).random().toLong())
+    }
+
+    //Calculate the final money
+    fun race_resukt(ratio_horse: MutableLiveData<Double>) {
+        var ratio = ratio_horse.value!!.toDouble()
+        var exchange_ratio = currency.value!!.toDouble()
+        if (bethorsename == winner) {
+            earn = ((betmoney!!.toDouble()) * ratio * exchange_ratio).toInt()
+            capital.value = (capital.value)?.plus(earn!!)
+        } else {
+            earn = 0
+            betmoney = (betmoney!!.toDouble() * exchange_ratio).toInt()
+            capital.value = (capital.value)?.minus(betmoney!!)
         }
     }
 }
