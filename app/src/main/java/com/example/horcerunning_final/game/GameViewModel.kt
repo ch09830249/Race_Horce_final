@@ -1,8 +1,13 @@
 package com.example.horcerunning_final.game
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.horcerunning_final.database.Record
+import com.example.horcerunning_final.json.Currency
+import com.example.horcerunning_final.network.MyAPIService
+import com.example.horcerunning_final.network.RetrofitManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +48,23 @@ class GameViewModel : ViewModel() {
     }
 
     fun fetch_exchangeRate() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val apiService = RetrofitManager.client.create(MyAPIService::class.java)
+            apiService.getExchangeRate().enqueue(object: Callback<Currency>{
+                override fun onResponse(call: Call<Currency>, response: Response<Currency>) {
+                    Log.v("Game", "Network access successfully")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        currency.value = response.body()!!.USDTWD!!.Exrate
+                    }
+                }
+                override fun onFailure(call: Call<Currency>, t: Throwable) {
+                    Log.v("Game", "Network access failed")
+                }
+            })
+        }
+    }
+
+    fun access_database(context: Context){
         CoroutineScope(Dispatchers.IO).launch {
         }
     }
@@ -89,7 +111,7 @@ class GameViewModel : ViewModel() {
 
     //The functions of each horse running
     fun Run(horseName: String) {
-        var name = horseName
+        val name = horseName
         lateinit var miles_horse: MutableLiveData<Int>
         lateinit var ratio_horse: MutableLiveData<Double>
         when (name) {
@@ -142,8 +164,8 @@ class GameViewModel : ViewModel() {
 
     //Calculate the final money
     fun race_resukt(ratio_horse: MutableLiveData<Double>) {
-        var ratio = ratio_horse.value!!.toDouble()
-        var exchange_ratio = currency.value!!.toDouble()
+        val ratio = ratio_horse.value!!.toDouble()
+        val exchange_ratio = currency.value!!.toDouble()
         if (bethorsename == winner) {
             earn = ((betmoney!!.toDouble()) * ratio * exchange_ratio).toInt()
             capital.value = (capital.value)?.plus(earn!!)

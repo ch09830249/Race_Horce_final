@@ -16,8 +16,6 @@ buildscript {
 ext {
     navigationVersion = "2.3.5"
     lifecycle_version = "2.4.0"
-    version_retrofit = "2.9.0"
-    version_moshi = "1.9.3"
 }
 
 task clean(type: Delete) {

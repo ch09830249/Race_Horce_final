@@ -34,7 +34,6 @@ class GameFragment : Fragment() {
             false
         )
 
-        Log.i("GameFragment", "Called ViewModelProvider.get")
         viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
 
         viewModel.fetch_exchangeRate()

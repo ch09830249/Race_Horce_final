@@ -57,11 +57,12 @@ dependencies {
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
-    // OkHttp3
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    //gson converter
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
-    // moshi
-    implementation "com.squareup.moshi:moshi-kotlin:1.9.2"
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
+    //Room
+    implementation "androidx.room:room-runtime:2.4.0-alpha01"
+    annotationProcessor "androidx.room:room-compiler:2.4.0-alpha01"
+    kapt "androidx.room:room-compiler:2.4.0-alpha01"
 
 }
