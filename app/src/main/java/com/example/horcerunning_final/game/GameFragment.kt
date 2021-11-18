@@ -1,5 +1,6 @@
 package com.example.horcerunning_final.game
 
+
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,8 +13,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.example.horcerunning_final.R
+import com.example.horcerunning_final.database.HistoryDatabase
 import com.example.horcerunning_final.databinding.FragmentGameBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.lang.Exception
+
 
 class GameFragment : Fragment() {
 
@@ -34,12 +40,20 @@ class GameFragment : Fragment() {
             false
         )
 
-        viewModel = ViewModelProvider(this).get(GameViewModel::class.java)
+        // Create an instance of the ViewModel Factory.
+        val application = requireNotNull(this.activity).application
+        val dataSource = HistoryDatabase.getInstance(application).getDao()
+
+        // Get a reference to the ViewModel associated with this fragment.
+        val viewModelFactory = GameViewModelFactory(dataSource, application)
+
+        viewModel = ViewModelProvider(this, viewModelFactory).get(GameViewModel::class.java)
 
         viewModel.fetch_exchangeRate()
 
         binding.lifecycleOwner = viewLifecycleOwner
 
+        //Start game button
         binding.button1.setOnClickListener {
             try {
                 viewModel.betmoney = binding.edittext.text.toString().trim().toInt()
@@ -47,14 +61,18 @@ class GameFragment : Fragment() {
                 val RadioBtm: RadioButton = binding.root.findViewById(RadioB1.getCheckedRadioButtonId())
                 viewModel.bethorsename = RadioBtm.text.toString()
             }catch (e: Exception){
+                Log.i("Game", "Please insert the money and choose one horse")
             }
             viewModel.startGame()
+
         }
 
+        //Navigate to the history records
         binding.button2.setOnClickListener { view: View ->
             view.findNavController().navigate(R.id.action_gameFragment_to_historyFragment)
         }
 
+        //Observe
         viewModel.miles_apple.observe(viewLifecycleOwner, Observer { newMiles ->
             binding.progressBar1.progress = newMiles
         })
@@ -85,6 +103,8 @@ class GameFragment : Fragment() {
         viewModel.currency.observe(viewLifecycleOwner, Observer { newExchangeRate ->
             binding.txtRatio4.text = newExchangeRate.toString()
         })
+
+
 
         return binding.root
     }

@@ -1,10 +1,12 @@
 package com.example.horcerunning_final.game
 
-import android.content.Context
+
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.example.horcerunning_final.database.Record
+import com.example.horcerunning_final.database.RecordDao
 import com.example.horcerunning_final.json.Currency
 import com.example.horcerunning_final.network.MyAPIService
 import com.example.horcerunning_final.network.RetrofitManager
@@ -16,22 +18,25 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class GameViewModel : ViewModel() {
+class GameViewModel(private val database: RecordDao, application: Application) : AndroidViewModel(application) {
 
     var winner: String? = null                     //The winner horse
+    //Mile of each horse
     var miles_apple = MutableLiveData<Int>()
     var miles_banana = MutableLiveData<Int>()
     var miles_orange = MutableLiveData<Int>()
     var miles_pineapple = MutableLiveData<Int>()
+    //Ratio of each horse
     var ratio_apple = MutableLiveData<Double>()
     var ratio_banana = MutableLiveData<Double>()
     var ratio_orange = MutableLiveData<Double>()
     var ratio_pineapple = MutableLiveData<Double>()
     var capital = MutableLiveData<Int>()                      //ALl money we have
-    var currency = MutableLiveData<Double>()                      //Exchage Rate from the USD to TWD
+    var currency = MutableLiveData<Double>()                  //Exchange Rate from the USD to TWD
     var betmoney: Int? = null                      //The money you bet in this turn
     var bethorsename: String? = null               //The horse you bet in this turn
     var earn: Int? = 0                           //The money you earn in this turn
+
 
     init {
         miles_apple.value = 0
@@ -44,10 +49,12 @@ class GameViewModel : ViewModel() {
         ratio_pineapple.value = 2.0
         capital.value = 10000
         currency.value = 30.0
+        database.deleteall()
         Log.i("GameViewModel", "GameViewModel created!")
     }
 
-    fun fetch_exchangeRate() {
+    //Fetch the exchange rate from open api
+    fun fetch_exchangeRate(){
         CoroutineScope(Dispatchers.IO).launch {
             val apiService = RetrofitManager.client.create(MyAPIService::class.java)
             apiService.getExchangeRate().enqueue(object: Callback<Currency>{
@@ -64,12 +71,7 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun access_database(context: Context){
-        CoroutineScope(Dispatchers.IO).launch {
-        }
-    }
-
-
+    //Start the game
     fun startGame() {
         CoroutineScope(Dispatchers.Main).launch {
 
@@ -93,10 +95,16 @@ class GameViewModel : ViewModel() {
             job3.join()
             job4.join()
 
-            println(earn)
-            println(winner)
             println(bethorsename)
             println(betmoney)
+            println(winner)
+            println(capital.value)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                val newData = Record(null, bethorsename!!, betmoney!!, winner!!, earn!!, capital.value!!)
+                database.insertData(newData)
+            }
+
         }
 
     }
@@ -152,7 +160,7 @@ class GameViewModel : ViewModel() {
             miles_horse.value = (miles_horse.value)?.plus(1)
             if (winner == null) {
                 winner = horseName
-                race_resukt(ratio_horse)
+                race_result(ratio_horse)
                 if (ratio_horse.value!! > 2.0)
                     ratio_horse.value = (ratio_horse.value)?.minus(0.1)
             } else {
@@ -163,7 +171,7 @@ class GameViewModel : ViewModel() {
     }
 
     //Calculate the final money
-    fun race_resukt(ratio_horse: MutableLiveData<Double>) {
+    fun race_result(ratio_horse: MutableLiveData<Double>) {
         val ratio = ratio_horse.value!!.toDouble()
         val exchange_ratio = currency.value!!.toDouble()
         if (bethorsename == winner) {
