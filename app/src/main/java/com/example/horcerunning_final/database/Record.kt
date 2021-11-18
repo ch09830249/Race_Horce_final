@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Record(
-    @PrimaryKey(autoGenerate = true) val id: Int? = 0,
+    @PrimaryKey val id: Int,
     @ColumnInfo val Bethorse: String,
     @ColumnInfo val Betmoney: Int,
     @ColumnInfo val Winner: String,

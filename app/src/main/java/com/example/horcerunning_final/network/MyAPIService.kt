@@ -6,6 +6,7 @@ import com.example.horcerunning_final.json.Currency
 import retrofit2.Call
 
 interface MyAPIService {
+    //Assign the path to the Json file
     @GET("capi.php")
     fun getExchangeRate(): Call<Currency>
 }

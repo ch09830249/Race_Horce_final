@@ -1,13 +1,20 @@
 package com.example.horcerunning_final.history
 
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.horcerunning_final.R
+import com.example.horcerunning_final.database.HistoryDatabase
+import com.example.horcerunning_final.database.Record
 import com.example.horcerunning_final.databinding.FragmentHistoryBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class HistoryFragment : Fragment() {
@@ -18,6 +25,16 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+
+        //Get all data
+        lateinit var data_list: List<Record>
+        val application = requireNotNull(this.activity).application
+        val database = HistoryDatabase.getInstance(application).getDao()
+        CoroutineScope(Dispatchers.IO).launch {
+            data_list = database.getAll()
+        }
+
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
             inflater,
@@ -25,6 +42,17 @@ class HistoryFragment : Fragment() {
             container,
             false
         )
+
+        //New a recyclerview's layoutManager as LinearLayoutManager
+        val layoutManager = LinearLayoutManager(this.activity)
+        layoutManager.orientation = LinearLayoutManager.VERTICAL
+        val adapter = HistoryRecordAdapter(data_list)
+
+        //Set recyclerview's layoutManager and adapter
+        binding.recyclerview.layoutManager = layoutManager
+        binding.recyclerview.adapter = adapter
+
+
         return binding.root
     }
 

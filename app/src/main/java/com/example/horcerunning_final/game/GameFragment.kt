@@ -1,6 +1,5 @@
 package com.example.horcerunning_final.game
 
-
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,16 +14,12 @@ import androidx.navigation.findNavController
 import com.example.horcerunning_final.R
 import com.example.horcerunning_final.database.HistoryDatabase
 import com.example.horcerunning_final.databinding.FragmentGameBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.lang.Exception
-
 
 class GameFragment : Fragment() {
 
+    //Global variables
     private lateinit var binding: FragmentGameBinding
-
     private lateinit var viewModel: GameViewModel
 
     override fun onCreateView(
@@ -40,21 +35,28 @@ class GameFragment : Fragment() {
             false
         )
 
-        // Create an instance of the ViewModel Factory.
+        //Get the activity's application
         val application = requireNotNull(this.activity).application
+
+        //Get the database's Dao by this application
         val dataSource = HistoryDatabase.getInstance(application).getDao()
 
-        // Get a reference to the ViewModel associated with this fragment.
+        // Create an instance of the ViewModel Factory
         val viewModelFactory = GameViewModelFactory(dataSource, application)
 
+        // Get a reference to the ViewModel associated with this fragment.
         viewModel = ViewModelProvider(this, viewModelFactory).get(GameViewModel::class.java)
 
+        //Fetch the exchange rate USDTWD from the internet
         viewModel.fetch_exchangeRate()
 
+        //??
         binding.lifecycleOwner = viewLifecycleOwner
 
         //Start game button
         binding.button1.setOnClickListener {
+
+            //Try to fetch the bet money and the horse name to the GameViewModel
             try {
                 viewModel.betmoney = binding.edittext.text.toString().trim().toInt()
                 val RadioB1 = binding.rg1
@@ -63,6 +65,8 @@ class GameFragment : Fragment() {
             }catch (e: Exception){
                 Log.i("Game", "Please insert the money and choose one horse")
             }
+
+            //Start the game
             viewModel.startGame()
 
         }
@@ -103,8 +107,6 @@ class GameFragment : Fragment() {
         viewModel.currency.observe(viewLifecycleOwner, Observer { newExchangeRate ->
             binding.txtRatio4.text = newExchangeRate.toString()
         })
-
-
 
         return binding.root
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.horcerunning_final.database.RecordDao
 
+//RecordDao and Application should be given when the ViewModel created
 class GameViewModelFactory(
     private val dataSource: RecordDao,
     private val application: Application

@@ -1,6 +1,5 @@
 package com.example.horcerunning_final.game
 
-
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -20,12 +19,14 @@ import retrofit2.Response
 
 class GameViewModel(private val database: RecordDao, application: Application) : AndroidViewModel(application) {
 
-    var winner: String? = null                     //The winner horse
+    var winner: String? = null                     //The winner horse name
+
     //Mile of each horse
     var miles_apple = MutableLiveData<Int>()
     var miles_banana = MutableLiveData<Int>()
     var miles_orange = MutableLiveData<Int>()
     var miles_pineapple = MutableLiveData<Int>()
+
     //Ratio of each horse
     var ratio_apple = MutableLiveData<Double>()
     var ratio_banana = MutableLiveData<Double>()
@@ -36,6 +37,7 @@ class GameViewModel(private val database: RecordDao, application: Application) :
     var betmoney: Int? = null                      //The money you bet in this turn
     var bethorsename: String? = null               //The horse you bet in this turn
     var earn: Int? = 0                           //The money you earn in this turn
+    var lastDataID: Int = 1
 
 
     init {
@@ -49,19 +51,29 @@ class GameViewModel(private val database: RecordDao, application: Application) :
         ratio_pineapple.value = 2.0
         capital.value = 10000
         currency.value = 30.0
-        database.deleteall()
+        lastDataID = 1
+
+        //PS: Must place the database access codes in the CoroutineScope(Dispatchers.IO) and launch
+        CoroutineScope(Dispatchers.IO).launch {
+            database.deleteall()
+        }
         Log.i("GameViewModel", "GameViewModel created!")
     }
+
 
     //Fetch the exchange rate from open api
     fun fetch_exchangeRate(){
         CoroutineScope(Dispatchers.IO).launch {
+
+            //PS: Import right packages in this class (EX: Many packages have Callback class)
             val apiService = RetrofitManager.client.create(MyAPIService::class.java)
             apiService.getExchangeRate().enqueue(object: Callback<Currency>{
                 override fun onResponse(call: Call<Currency>, response: Response<Currency>) {
-                    Log.v("Game", "Network access successfully")
+
+                    //PS: Update LiveData in the Main thread
                     CoroutineScope(Dispatchers.Main).launch {
                         currency.value = response.body()!!.USDTWD!!.Exrate
+                        Log.v("Game", "Network access successfully")
                     }
                 }
                 override fun onFailure(call: Call<Currency>, t: Throwable) {
@@ -77,6 +89,7 @@ class GameViewModel(private val database: RecordDao, application: Application) :
 
             initializeGame()
 
+            //Four horses run concurrently
             val job1 = CoroutineScope(Dispatchers.IO).launch {
                 Run("apple")
             }
@@ -95,20 +108,16 @@ class GameViewModel(private val database: RecordDao, application: Application) :
             job3.join()
             job4.join()
 
-            println(bethorsename)
-            println(betmoney)
-            println(winner)
-            println(capital.value)
-
+            //Insert the game record
             CoroutineScope(Dispatchers.IO).launch {
-                val newData = Record(null, bethorsename!!, betmoney!!, winner!!, earn!!, capital.value!!)
+                val newData = Record(lastDataID, bethorsename!!, betmoney!!, winner!!, earn!!, capital.value!!)
                 database.insertData(newData)
+                lastDataID++
             }
-
         }
-
     }
 
+    //Initialize the game before the game starts
     private fun initializeGame() {
         miles_apple.value = 0
         miles_banana.value = 0

@@ -9,12 +9,13 @@ import androidx.room.RoomDatabase
 abstract class HistoryDatabase : RoomDatabase() {
     abstract fun getDao(): RecordDao
 
-    //Single instance
+    //Singleton: Single instance for this class
     companion object {
 
         @Volatile
         private var INSTANCE: HistoryDatabase? = null
 
+        //Should pass the Context before get the database
         fun getInstance(context: Context): HistoryDatabase {
             synchronized(this) {
                 var instance = INSTANCE
