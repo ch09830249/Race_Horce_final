@@ -37,6 +37,8 @@ class GameViewModel(private val database: RecordDao, application: Application) :
     var betmoney: Int? = null                      //The money you bet in this turn
     var bethorsename: String? = null               //The horse you bet in this turn
     var earn: Int? = 0                           //The money you earn in this turn
+
+    //Each data row id in the database
     var lastDataID: Int = 1
 
 
