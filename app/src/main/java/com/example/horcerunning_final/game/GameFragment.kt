@@ -67,13 +67,22 @@ class GameFragment : Fragment() {
             }
 
             //Start the game
-            viewModel.startGame()
-
+            viewModel.startGame(application)
         }
 
         //Navigate to the history records
         binding.button2.setOnClickListener { view: View ->
             view.findNavController().navigate(R.id.action_gameFragment_to_historyFragment)
+        }
+
+        //Reset the game
+        binding.button3.setOnClickListener { view: View ->
+            viewModel.reset_game()
+        }
+
+        //Game over
+        binding.button4.setOnClickListener {
+            requireNotNull(this.activity).finish()
         }
 
         //Observe

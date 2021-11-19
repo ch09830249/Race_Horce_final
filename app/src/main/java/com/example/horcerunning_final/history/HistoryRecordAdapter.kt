@@ -1,14 +1,19 @@
 package com.example.horcerunning_final.history
 
+import android.app.Application
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.horcerunning_final.R
+import com.example.horcerunning_final.database.HistoryDatabase
 import com.example.horcerunning_final.database.Record
+import com.example.horcerunning_final.database.RecordDao
 
-class HistoryRecordAdapter(private val data: List<Record>): RecyclerView.Adapter<HistoryRecordAdapter.ViewHolder>() {
+//Data list as the argument
+class HistoryRecordAdapter(private val data: List<Record>, private val database: RecordDao, private val application: Application): RecyclerView.Adapter<HistoryRecordAdapter.ViewHolder>() {
 
     //The number of the data rows
     override fun getItemCount(): Int {
@@ -31,6 +36,7 @@ class HistoryRecordAdapter(private val data: List<Record>): RecyclerView.Adapter
     //Assign value to each view's text
     private fun bind(holder: HistoryRecordAdapter.ViewHolder, item: Record) {
         holder.id.text = item.id.toString()
+
         holder.betmoney.text = item.Betmoney.toString()
         holder.bethorse.text = item.Bethorse
         holder.capital.text = item.Captial.toString()

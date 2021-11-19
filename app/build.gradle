@@ -65,4 +65,7 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:2.4.0-alpha01"
     kapt "androidx.room:room-compiler:2.4.0-alpha01"
 
+    // Kotlin Extensions and Coroutines support for Room
+    implementation "androidx.room:room-ktx:2.4.0-alpha01"
+
 }

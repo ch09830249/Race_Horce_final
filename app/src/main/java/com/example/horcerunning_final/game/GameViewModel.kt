@@ -1,7 +1,9 @@
 package com.example.horcerunning_final.game
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.horcerunning_final.database.Record
@@ -62,6 +64,18 @@ class GameViewModel(private val database: RecordDao, application: Application) :
         Log.i("GameViewModel", "GameViewModel created!")
     }
 
+    fun reset_game(){
+        ratio_apple.value = 2.0
+        ratio_banana.value = 2.0
+        ratio_orange.value = 2.0
+        ratio_pineapple.value = 2.0
+        capital.value = 10000
+        lastDataID = 1
+        CoroutineScope(Dispatchers.IO).launch {
+            database.deleteall()
+        }
+        fetch_exchangeRate()
+    }
 
     //Fetch the exchange rate from open api
     fun fetch_exchangeRate(){
@@ -86,7 +100,13 @@ class GameViewModel(private val database: RecordDao, application: Application) :
     }
 
     //Start the game
-    fun startGame() {
+    fun startGame(context: Context) {
+
+        if(betmoney == null || betmoney!! > 10){
+            Toast.makeText(this.getApplication(), "Please insert the correct bet", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         CoroutineScope(Dispatchers.Main).launch {
 
             initializeGame()

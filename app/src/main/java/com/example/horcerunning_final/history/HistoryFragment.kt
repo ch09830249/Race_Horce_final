@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.horcerunning_final.R
 import com.example.horcerunning_final.database.HistoryDatabase
@@ -46,11 +47,15 @@ class HistoryFragment : Fragment() {
         //New a recyclerview's layoutManager as LinearLayoutManager
         val layoutManager = LinearLayoutManager(this.activity)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
-        val adapter = HistoryRecordAdapter(data_list)
+        val adapter = HistoryRecordAdapter(data_list, database, application)
 
         //Set recyclerview's layoutManager and adapter
         binding.recyclerview.layoutManager = layoutManager
         binding.recyclerview.adapter = adapter
+
+        binding.backGame.setOnClickListener{ view: View ->
+            view.findNavController().popBackStack()
+        }
 
 
         return binding.root
