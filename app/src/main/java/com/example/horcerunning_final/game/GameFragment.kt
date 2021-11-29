@@ -76,7 +76,7 @@ class GameFragment : Fragment() {
         }
 
         //Reset the game
-        binding.button3.setOnClickListener { view: View ->
+        binding.button3.setOnClickListener {
             viewModel.reset_game()
         }
 

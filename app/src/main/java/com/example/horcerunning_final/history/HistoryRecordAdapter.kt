@@ -6,14 +6,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.horcerunning_final.R
 import com.example.horcerunning_final.database.HistoryDatabase
 import com.example.horcerunning_final.database.Record
 import com.example.horcerunning_final.database.RecordDao
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 //Data list as the argument
 class HistoryRecordAdapter(private val data: List<Record>, private val database: RecordDao, private val application: Application): RecyclerView.Adapter<HistoryRecordAdapter.ViewHolder>() {
+
+    //Get the database's Dao by this application
+    val dataSource = HistoryDatabase.getInstance(application).getDao()
 
     //The number of the data rows
     override fun getItemCount(): Int {
@@ -36,7 +43,15 @@ class HistoryRecordAdapter(private val data: List<Record>, private val database:
     //Assign value to each view's text
     private fun bind(holder: HistoryRecordAdapter.ViewHolder, item: Record) {
         holder.id.text = item.id.toString()
-
+        holder.id.setOnClickListener { view ->
+            CoroutineScope(Dispatchers.Main).launch {
+                val job = CoroutineScope(Dispatchers.IO).launch {
+                    dataSource.deleteById(item.id)
+                }
+                job.join()
+                view.findNavController().navigate(R.id.action_global_historyFragment)
+            }
+        }
         holder.betmoney.text = item.Betmoney.toString()
         holder.bethorse.text = item.Bethorse
         holder.capital.text = item.Captial.toString()

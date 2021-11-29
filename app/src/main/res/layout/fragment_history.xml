@@ -17,8 +17,8 @@
             android:layout_alignParentTop="true"
             android:gravity="center"
             android:padding="10dp"
-            android:text="History Records"
-            android:textSize="40sp"
+            android:text="History Records (Delete a data by pressing its id)"
+            android:textSize="15sp"
             android:textColor="#000000"
             android:background="#46A3FF"/>
 

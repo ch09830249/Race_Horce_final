@@ -11,6 +11,8 @@ interface RecordDao {
     suspend fun insertData(id: Int, bethorse: String, betmoney: Int, winner: String, earn: Int, capital: Int)
     @Query("DELETE FROM record")
     suspend fun deleteall()
+    @Query("DELETE FROM record WHERE id = :id")
+    suspend fun deleteById(id: Int)
     @Update
     suspend fun update(record: Record)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
