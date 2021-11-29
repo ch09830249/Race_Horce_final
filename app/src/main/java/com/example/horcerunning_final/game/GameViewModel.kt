@@ -210,8 +210,8 @@ class GameViewModel(private val database: RecordDao, application: Application) :
             capital.value = (capital.value)?.plus(earn!!)
         } else {
             earn = 0
-            betmoney = (betmoney!!.toDouble() * exchange_ratio).toInt()
-            capital.value = (capital.value)?.minus(betmoney!!)
+            val loss = (betmoney!!.toDouble() * exchange_ratio).toInt()
+            capital.value = (capital.value)?.minus(loss!!)
         }
     }
 }
