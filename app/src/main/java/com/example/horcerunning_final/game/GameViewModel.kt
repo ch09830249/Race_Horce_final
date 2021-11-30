@@ -58,9 +58,9 @@ class GameViewModel(private val database: RecordDao, application: Application) :
         lastDataID = 1
 
         //PS: Must place the database access codes in the CoroutineScope(Dispatchers.IO) and launch
-        CoroutineScope(Dispatchers.IO).launch {
-            database.deleteall()
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            database.deleteall()
+//        }
         Log.i("GameViewModel", "GameViewModel created!")
     }
 
