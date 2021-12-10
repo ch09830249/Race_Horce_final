@@ -32,9 +32,6 @@ class HistoryFragment : Fragment() {
         lateinit var data_list: List<Record>
         val application = requireNotNull(this.activity).application
         val database = HistoryDatabase.getInstance(application).getDao()
-        CoroutineScope(Dispatchers.IO).launch {
-            data_list = database.getAll()
-        }
 
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(
@@ -47,16 +44,22 @@ class HistoryFragment : Fragment() {
         //New a recyclerview's layoutManager as LinearLayoutManager
         val layoutManager = LinearLayoutManager(this.activity)
         layoutManager.orientation = LinearLayoutManager.VERTICAL
-        val adapter = HistoryRecordAdapter(data_list, database, application)
 
-        //Set recyclerview's layoutManager and adapter
-        binding.recyclerview.layoutManager = layoutManager
-        binding.recyclerview.adapter = adapter
+        CoroutineScope(Dispatchers.Main).launch {
+            //Get all the Records
+            val job = CoroutineScope(Dispatchers.IO).launch {
+                data_list = database.getAll()
+            }
+            job.join()
+            val adapter = HistoryRecordAdapter(data_list, database, application)
+            //Set recyclerview's layoutManager and adapter
+            binding.recyclerview.layoutManager = layoutManager
+            binding.recyclerview.adapter = adapter
+        }
 
         binding.backGame.setOnClickListener{ view: View ->
             view.findNavController().popBackStack()
         }
-
 
         return binding.root
     }
